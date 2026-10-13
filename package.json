@@ -6,7 +6,7 @@
   "description": "Development kit for the cev-sim kinematic bicycle dynamics plugin. The installed package is package/ only.",
   "scripts": {
     "export:tape": "node --experimental-default-type=module tools/export-tape.mjs",
-    "test": "cargo test --manifest-path package/Cargo.toml --locked && cargo test --manifest-path crates/tape/Cargo.toml --locked && node --experimental-default-type=module --test tests/parity.test.js",
+    "test": "cargo test --manifest-path package/Cargo.toml --locked && cargo test --manifest-path crates/tape/Cargo.toml --locked && cargo test --manifest-path crates/predict/Cargo.toml --locked && cargo test --manifest-path crates/wire/Cargo.toml --locked && cargo test --manifest-path crates/zenoh/Cargo.toml --locked && node --experimental-default-type=module --test tests/parity.test.js",
     "verify": "node --experimental-default-type=module tools/verify.mjs"
   }
 }

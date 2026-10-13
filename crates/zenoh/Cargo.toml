@@ -1,0 +1,12 @@
+[package]
+name = "cornellev_dynamics_zenoh"
+version = "0.1.0"
+edition = "2021"
+publish = false
+description = "Zenoh queryable that returns the next bicycle state."
+
+[dependencies]
+cornellev_dynamics_predict = { path = "../predict" }
+cornellev_dynamics_wire = { path = "../wire" }
+tokio = { version = "1", features = ["macros", "rt-multi-thread"] }
+zenoh = { version = "1.10.1", features = ["unstable"] }

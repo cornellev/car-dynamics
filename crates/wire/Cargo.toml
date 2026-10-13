@@ -1,0 +1,9 @@
+[package]
+name = "cornellev_dynamics_wire"
+version = "0.1.0"
+edition = "2021"
+publish = false
+description = "Little-endian request and response frames for one bicycle prediction."
+
+[dependencies]
+cornellev_dynamics_predict = { path = "../predict" }

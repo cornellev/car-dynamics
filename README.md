@@ -14,6 +14,9 @@ JavaScript bicycle unless a vehicle sets `dynamics.plant`.
 ```text
 package/          # The only directory passed to Install. Cargo builds plant.wasm.
 crates/tape/      # Native replay of fixtures/bicycle-tape.v1.json through step.
+crates/predict/   # One call, or a constant-command horizon, through step.
+crates/wire/      # 136-byte little-endian request and response frames.
+crates/zenoh/     # dynamics-zenoh queryable. Not packed and not built by Install.
 fixtures/         # Committed bicycle tape, generated from the JavaScript plant.
 tools/            # Export, path lookup, and install verify. Never packed.
 tests/            # WebAssembly parity against the JavaScript plant.
@@ -45,8 +48,31 @@ npm test
 npm run verify
 ```
 
-`npm test` runs the plant crate tests, the native tape replay, and a
-WebAssembly comparison within 1e-9 of `KinematicVehiclePlant`. `npm run verify`
-builds into a temporary plugin store and checks the installed document. Rust
-1.81.0 with the `wasm32-unknown-unknown` target is selected by
-`rust-toolchain.toml`.
+`npm test` runs the plant crate tests, the native tape replay, the prediction
+and wire crates, the Zenoh loopback query, and a WebAssembly comparison within
+1e-9 of `KinematicVehiclePlant`. `npm run verify` builds into a temporary
+plugin store and checks the installed document. Install uses Rust 1.81.0 from
+`package/rust-toolchain.toml`. The kit toolchain is Rust 1.89.0 because the
+Zenoh crate's dependencies need a newer compiler than the plant package.
+
+## Zenoh
+
+`dynamics-zenoh` is a separate program. It does not replace plugin install.
+
+```bash
+cargo run --manifest-path crates/zenoh/Cargo.toml
+cargo run --manifest-path crates/zenoh/Cargo.toml -- --key vendor/cornellev/dynamics/bicycle --config zenoh.json5
+```
+
+The default queryable is `vendor/cornellev/dynamics/bicycle`. The process keeps
+no vehicle state. Each query payload is one 136-byte little-endian request:
+
+- `u32` version `1`
+- `u32` step count (`1` for the next state only, at most `64`)
+- `f64` dt, wheelbase, and maxSteeringAngle
+- 13 `f64` values in `cev-sim.plant-state@1` order
+
+The reply is version, an `i32` code, a count, and that many states. A count
+greater than one holds the acceleration and steering from the request and
+integrates them for that many steps of `dt`. `0` is success. Negative codes
+reject the frame; a positive code comes from the plant.
