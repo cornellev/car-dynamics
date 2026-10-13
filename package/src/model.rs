@@ -11,9 +11,8 @@ fn parameter(params: &[f64], index: usize, fallback: f64) -> f64 {
     params.get(index).copied().unwrap_or(fallback)
 }
 
-/// Explicit Euler bicycle step. Order matches `KinematicVehiclePlant.update`:
-/// accelerate, translate at the old yaw, then integrate yaw. `y`, `rotation.x`,
-/// and `rotation.z` stay unchanged so the host can drape them.
+/// basic ahh bicycle model, with no slip, no roll, no pitch, and no lateral velocity.
+/// need to implement those soon.
 pub fn step(state: &mut PlantState, params: &[f64], dt: f64) -> i32 {
     let wheelbase = parameter(params, 0, 1.5).max(1.0e-9);
     let maximum = parameter(params, 1, 0.6).min(std::f64::consts::PI * 0.49);
@@ -29,6 +28,10 @@ pub fn step(state: &mut PlantState, params: &[f64], dt: f64) -> i32 {
     0
 }
 
+/// Arguably if the model is changed then i'd prob just remove the following tests lowk
+/// but for now they are here to make sure the ABI is stable and that the model is still correct.
+/// just run the test cases pls after changing the model and either update them (or ask claude to update them)
+/// or remove them for ease.
 #[cfg(test)]
 mod tests {
     use super::*;
