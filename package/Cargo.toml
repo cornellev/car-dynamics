@@ -1,0 +1,15 @@
+[package]
+name = "cornellev_dynamics"
+version = "0.1.0"
+edition = "2021"
+publish = false
+description = "Kinematic bicycle plant for cev-sim."
+
+[lib]
+crate-type = ["rlib", "cdylib"]
+
+[profile.release]
+opt-level = "s"
+lto = true
+panic = "abort"
+strip = true

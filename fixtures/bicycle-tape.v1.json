@@ -1,0 +1,165 @@
+{
+  "kind": "cev-sim.bicycle-tape",
+  "version": 1,
+  "cases": [
+    {
+      "id": "big-car",
+      "wheelbase": 1.2446,
+      "maxSteeringAngle": 1.5393804002589986,
+      "initial": {
+        "position": [
+          1,
+          0,
+          2
+        ],
+        "rotation": [
+          0,
+          0.2,
+          0
+        ],
+        "velocity": [
+          3,
+          0,
+          0
+        ],
+        "acceleration": [
+          1,
+          0,
+          0
+        ],
+        "steering": 0.1
+      },
+      "steps": [
+        {
+          "dt": 0.02,
+          "acceleration": 0.4,
+          "steering": 0.05,
+          "expected": {
+            "x": 1.0589608053229291,
+            "z": 1.9880480530593692,
+            "yaw": 0.20241885680208294,
+            "velocityX": 3.008
+          }
+        },
+        {
+          "dt": 0.02,
+          "acceleration": -0.2,
+          "steering": -0.1,
+          "expected": {
+            "x": 1.1178141614873447,
+            "z": 1.9759696066284556,
+            "yaw": 0.19757544759519408,
+            "velocityX": 3.004
+          }
+        },
+        {
+          "dt": 0.02,
+          "acceleration": 1,
+          "steering": 0.2,
+          "expected": {
+            "x": 1.1771175461263625,
+            "z": 1.9640978346311206,
+            "yaw": 0.20742592401136353,
+            "velocityX": 3.024
+          }
+        },
+        {
+          "dt": 0.02,
+          "acceleration": 0,
+          "steering": 0,
+          "expected": {
+            "x": 1.2363011129101338,
+            "z": 1.9516424814546394,
+            "yaw": 0.20742592401136353,
+            "velocityX": 3.024
+          }
+        },
+        {
+          "dt": 0.02,
+          "acceleration": 0.25,
+          "steering": 0.15,
+          "expected": {
+            "x": 1.2955825361204656,
+            "z": 1.939166534109546,
+            "yaw": 0.21478232085369964,
+            "velocityX": 3.029
+          }
+        },
+        {
+          "dt": 0.02,
+          "acceleration": -0.5,
+          "steering": -0.05,
+          "expected": {
+            "x": 1.3545751735299125,
+            "z": 1.9262974575506973,
+            "yaw": 0.21235461849815165,
+            "velocityX": 3.019
+          }
+        }
+      ]
+    },
+    {
+      "id": "defaults",
+      "wheelbase": 1.5,
+      "maxSteeringAngle": 0.6,
+      "initial": {
+        "position": [
+          0,
+          2,
+          0
+        ],
+        "rotation": [
+          0.15,
+          -0.4,
+          0.05
+        ],
+        "velocity": [
+          2,
+          0,
+          0
+        ],
+        "acceleration": [
+          0,
+          0,
+          0
+        ],
+        "steering": 0
+      },
+      "steps": [
+        {
+          "dt": 0.05,
+          "acceleration": 0,
+          "steering": 0.8,
+          "expected": {
+            "x": 0.09210609940028852,
+            "z": 0.03894183423086506,
+            "yaw": -0.3543908794438872,
+            "velocityX": 2
+          }
+        },
+        {
+          "dt": 0.05,
+          "acceleration": -1,
+          "steering": -0.3,
+          "expected": {
+            "x": 0.18354725823168289,
+            "z": 0.07277620243202562,
+            "yaw": -0.3744977356685127,
+            "velocityX": 1.95
+          }
+        },
+        {
+          "dt": 0.1,
+          "acceleration": 0.5,
+          "steering": 0,
+          "expected": {
+            "x": 0.3696855522641266,
+            "z": 0.14593722685549537,
+            "yaw": -0.3744977356685127,
+            "velocityX": 2
+          }
+        }
+      ]
+    }
+  ]
+}
