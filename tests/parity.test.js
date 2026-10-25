@@ -6,8 +6,7 @@ import path from "node:path";
 import test from "node:test";
 import { promisify } from "node:util";
 
-import { simulateCase } from "../tools/bicycle-host.mjs";
-import { FIXTURE_PATH, hostModuleHref, PACKAGE_ROOT } from "../tools/paths.mjs";
+import { hostModuleHref, PACKAGE_ROOT } from "../tools/paths.mjs";
 
 const execFileAsync = promisify(execFile);
 
@@ -59,36 +58,14 @@ async function buildWasm() {
     }
 }
 
-function packState(sample) {
-    const state = new Float64Array(13);
-    state.set(sample.initial.position, 0);
-    state.set(sample.initial.rotation, 3);
-    state.set(sample.initial.velocity, 6);
-    state.set(sample.initial.acceleration, 9);
-    state[12] = sample.initial.steering;
-    return state;
-}
-
-async function stepWasm(stepper, sample) {
-    let state = packState(sample);
-    return sample.steps.map((step) => {
-        state[9] = step.acceleration;
-        state[12] = step.steering;
-        state = stepper.step(state, step.dt);
-        return {
-            x: state[0],
-            z: state[2],
-            yaw: state[4],
-            velocityX: state[6],
-        };
-    });
-}
-
-test("wasm bicycle matches the javascript plant within 1e-9", async () => {
+test("wasm axle forces match the javascript contact plant", async () => {
     const bytes = await buildWasm();
-    const tape = JSON.parse(await fs.readFile(FIXTURE_PATH, "utf8"));
     const document = JSON.parse(await fs.readFile(path.join(PACKAGE_ROOT, "plugin.json"), "utf8"));
     const plant = document.plants[0];
+    assert.equal(plant.model, "contact-bicycle-v1");
+    const { axleContactForces } = await import(
+        hostModuleHref("app/simulation/vehicles/contactBicycle.js")
+    );
     const { compilePlantModules, createPlantStepper } = await import(
         hostModuleHref("app/simulation/vehicles/WasmPlantStepper.js")
     );
@@ -99,27 +76,47 @@ test("wasm bicycle matches the javascript plant within 1e-9", async () => {
         moduleBytes: bytes,
     };
     const compiled = await compilePlantModules(new Map([[plant.id, definition]]));
-    for (const sample of tape.cases) {
-        const javascript = await simulateCase(sample);
-        const stepper = createPlantStepper(compiled.get(plant.id), definition, {
-            kinematics: {
-                wheelbase: sample.wheelbase,
-                maxSteeringAngle: sample.maxSteeringAngle,
-            },
-        });
-        const wasm = await stepWasm(stepper, sample);
-        assert.equal(wasm.length, sample.steps.length);
-        for (let index = 0; index < wasm.length; index += 1) {
-            for (const field of ["x", "z", "yaw", "velocityX"]) {
-                assert.ok(
-                    Math.abs(wasm[index][field] - javascript[index][field]) <= 1e-9,
-                    `${sample.id} step ${index} ${field}`,
-                );
-                assert.ok(
-                    Math.abs(javascript[index][field] - sample.steps[index].expected[field]) <= 1e-9,
-                    `${sample.id} step ${index} ${field} drifted from the fixture`,
-                );
-            }
-        }
+    const stepper = createPlantStepper(compiled.get(plant.id), definition, {
+        kinematics: { wheelbase: 1.5, maxSteeringAngle: 0.6 },
+    });
+    const state = new Float64Array(13);
+    state[0] = 3;
+    state[1] = 4;
+    state[2] = 5;
+    state[4] = 0.25;
+    state[6] = 8;
+    state[9] = 8;
+    state[10] = 1;
+    state[11] = 1500 * 9.81;
+    state[12] = 0.4;
+    const next = stepper.step(state, 0.01);
+    const forces = axleContactForces({
+        vx: 8,
+        vy: 0,
+        r: 0,
+        delta: 0.4,
+        axCommand: 8,
+        gradeX: 0,
+        normalLoad: 1500 * 9.81,
+        inContact: true,
+        lf: 0.75,
+        lr: 0.75,
+    });
+    for (const [actual, expected, label] of [
+        [next[0], 3, "x"],
+        [next[6], forces.Fxf, "Fxf"],
+        [next[7], forces.Fyf, "Fyf"],
+        [next[9], forces.Fxr, "Fxr"],
+        [next[10], forces.Fyr, "Fyr"],
+    ]) {
+        assert.ok(Math.abs(actual - expected) <= 1e-6, `${label}: ${actual} vs ${expected}`);
     }
+    state[10] = 0;
+    state[11] = 0;
+    const airborne = stepper.step(state, 0.02);
+    assert.equal(airborne[6], 0);
+    assert.equal(airborne[7], 0);
+    assert.equal(airborne[9], 0);
+    assert.equal(airborne[10], 0);
+    assert.equal(airborne[1], 4);
 });

@@ -3,4 +3,4 @@
 mod abi;
 mod model;
 
-pub use model::{step, PlantState};
+pub use model::{kinematic_step, step, PlantState};

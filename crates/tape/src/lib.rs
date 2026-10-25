@@ -1,7 +1,7 @@
 use std::fs;
 use std::path::{Path, PathBuf};
 
-use cornellev_dynamics::{step as plant_step, PlantState};
+use cornellev_dynamics::{kinematic_step as plant_step, PlantState};
 use serde::Deserialize;
 
 const TOLERANCE: f64 = 1e-9;

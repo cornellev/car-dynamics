@@ -3,7 +3,7 @@ name = "cornellev_dynamics"
 version = "0.1.0"
 edition = "2021"
 publish = false
-description = "Kinematic bicycle plant for cev-sim."
+description = "Contact bicycle plant for cev-sim. The Zenoh horizon stays the planar bicycle."
 
 [lib]
 crate-type = ["rlib", "cdylib"]

@@ -1,4 +1,4 @@
-use cornellev_dynamics::step;
+use cornellev_dynamics::kinematic_step;
 
 pub use cornellev_dynamics::PlantState;
 
@@ -13,7 +13,7 @@ pub fn predict_horizon(
     let mut current = state;
     let mut predicted = Vec::with_capacity(steps);
     for _ in 0..steps {
-        let code = step(&mut current, params, dt);
+        let code = kinematic_step(&mut current, params, dt);
         if code != 0 {
             return Err(code);
         }
