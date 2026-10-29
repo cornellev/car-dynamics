@@ -1,7 +1,7 @@
 {
   "name": "vendor-cornellev-dynamics-kit",
   "private": true,
-  "version": "0.1.0",
+  "version": "0.1.2",
   "type": "module",
   "description": "Development kit for the cev-sim kinematic bicycle dynamics plugin. The installed package is package/ only.",
   "scripts": {

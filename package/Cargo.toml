@@ -1,6 +1,6 @@
 [package]
 name = "cornellev_dynamics"
-version = "0.1.0"
+version = "0.1.2"
 edition = "2021"
 publish = false
 description = "Contact bicycle plant for cev-sim. The Zenoh horizon stays the planar bicycle."
